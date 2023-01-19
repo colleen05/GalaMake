@@ -87,7 +87,7 @@ void PrintHelp() {
         << "    build <resource-uri>    Builds resource file of specified resource.\n"
         << "    buildall                Builds project using settings in '" GALAMAKE_CONFIG_NAME "'.\n"
         << "    scan                    Scans and lists each valid resource.\n"
-        << "    report                  Scans for and lists missing direcotires and broken resources.\n"
+        << "    report                  Scans for and lists missing directories and broken resources.\n"
         << "    repair                  Scans for and repairs broken resources and workspace structure.\n"
         << "\n"
         << "Options:\n"

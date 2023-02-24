@@ -7,6 +7,17 @@ bool BuildTextureResource(const ResourceInfo &resource) {
     if(!std::filesystem::exists(sourcePath)) return false;
     std::filesystem::create_directory(sourcePath + "tmp");
 
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
+
     // Prepare QOI texture
     Image img_texture = LoadImage(std::string(sourcePath + "texture.png").c_str());
     if(!ExportImage(img_texture, std::string(sourcePath + "tmp/texture.qoi").c_str())) return false;
@@ -21,6 +32,9 @@ bool BuildTextureResource(const ResourceInfo &resource) {
     xdt::Table gresTable;
 
     gresTable.SetString("type", "texture");
+
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
 
     unsigned int textureBytes = 0;
     const auto textureData = LoadFileData(std::string(sourcePath + "tmp/texture.qoi").c_str(), &textureBytes);
@@ -44,6 +58,17 @@ bool BuildSpriteResource(const ResourceInfo &resource) {
 
     if(!std::filesystem::exists(sourcePath)) return false;
     std::filesystem::create_directory(sourcePath + "tmp");
+
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
     
     // Prepare QOI texture
     Image img_texture = LoadImage(std::string(sourcePath + "texture.png").c_str());
@@ -59,6 +84,9 @@ bool BuildSpriteResource(const ResourceInfo &resource) {
     xdt::Table gresTable;
 
     gresTable.SetString("type", "sprite");
+
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
 
     gresTable.SetInt16("origin_x", j_data["origin"][0]);
     gresTable.SetInt16("origin_y", j_data["origin"][1]);
@@ -97,6 +125,17 @@ bool BuildTilesetResource(const ResourceInfo &resource) {
     if(!std::filesystem::exists(sourcePath)) return false;
     std::filesystem::create_directory(sourcePath + "tmp");
 
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
+
     // Prepare QOI texture
     Image img_texture = LoadImage(std::string(sourcePath + "texture.png").c_str());
     if(!ExportImage(img_texture, std::string(sourcePath + "tmp/texture.qoi").c_str())) return false;
@@ -111,6 +150,9 @@ bool BuildTilesetResource(const ResourceInfo &resource) {
     xdt::Table gresTable;
 
     gresTable.SetString("type", "tileset");
+
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
 
     gresTable.SetInt16("tile_size", j_data["tile_size"]);
 
@@ -145,6 +187,17 @@ bool BuildSoundResource(const ResourceInfo &resource) {
     const std::string &outputFile = resource.paths.outputPath;
 
     if(!std::filesystem::exists(sourcePath)) return false;
+
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
 
     // Determine audio type
     enum class AudioType {
@@ -197,6 +250,9 @@ bool BuildSoundResource(const ResourceInfo &resource) {
     gresTable.SetString("type", "sound");
     gresTable.SetString("encoding", typeNames[audioType]);
 
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
+
     unsigned int audioBytes = 0;
     auto audioData = LoadFileData(std::string(audioPath).c_str(), &audioBytes);
     gresTable.SetBytes("audio", std::vector<uint8_t>(audioData, audioData + audioBytes));
@@ -218,6 +274,24 @@ bool BuildFontResource(const ResourceInfo &resource) {
 
     if(!std::filesystem::exists(sourcePath)) return false;
 
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
+
+    // Check font file
+    const std::string fontPath = sourcePath + "font.ttf";
+
+    std::ifstream f_font(fontPath);
+    if(!f_font.good()) { f_font.close(); return false; }
+    f_font.close();
+
     // Read resource information
     std::ifstream f(sourcePath + "resource.json");
     if(!f.good()) { f.close(); return false; }
@@ -226,6 +300,23 @@ bool BuildFontResource(const ResourceInfo &resource) {
 
     // Compile gres data
     xdt::Table gresTable;
+
+    gresTable.SetString("type", "font");
+
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
+
+    unsigned int fontBytes = 0;
+    auto fontData = LoadFileData(fontPath.c_str(), &fontBytes);
+
+    // Font fnt = LoadFont(fontPath.c_str()); // Verify font data
+    // if((fnt.baseSize == 0) || (fnt.glyphCount == 0) || (fnt.texture.id == 0))
+    //     return false;
+    // UnloadFont(fnt);
+
+    gresTable.SetBytes("font", std::vector<uint8_t>(fontData, fontData + fontBytes));
+
+    gresTable.Save(outputFile);
 
     return true;
 }

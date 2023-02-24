@@ -16,4 +16,4 @@ mkdir -p bin/linux
 
 # Compiling
 echo "Compiling..."
-${CXX} -g -O3 -o bin/linux/galamake src/*.cpp -Iinclude -Llib/linux -lxdt -lraylib --std=c++17
+${CXX} -O3 -o bin/linux/galamake src/*.cpp -Iinclude -Llib/linux -lxdt -lraylib --std=c++17

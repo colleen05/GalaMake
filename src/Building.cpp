@@ -309,11 +309,6 @@ bool BuildFontResource(const ResourceInfo &resource) {
     unsigned int fontBytes = 0;
     auto fontData = LoadFileData(fontPath.c_str(), &fontBytes);
 
-    // Font fnt = LoadFont(fontPath.c_str()); // Verify font data
-    // if((fnt.baseSize == 0) || (fnt.glyphCount == 0) || (fnt.texture.id == 0))
-    //     return false;
-    // UnloadFont(fnt);
-
     gresTable.SetBytes("font", std::vector<uint8_t>(fontData, fontData + fontBytes));
 
     gresTable.Save(outputFile);

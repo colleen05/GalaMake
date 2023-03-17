@@ -5,8 +5,12 @@ bool FixTextureResource(const ResourceInfo &resource) {
         return false;
 
     if(!std::filesystem::exists(resource.paths.inputPath + "resource.json")) {
+        json config = {
+            {"texture_filter", "point"}
+        };
+
         std::ofstream f(resource.paths.inputPath + "resource.json");
-        f << "{\n}";
+        f << config.dump(4);
         f.close();
 
         if(!std::filesystem::exists(resource.paths.inputPath + "resource.json"))
@@ -30,7 +34,8 @@ bool FixSpriteResource(const ResourceInfo &resource) {
             {"origin", {0, 0}},
             {"frames", {
                 {0, 0, imageWidth, imageHeight}
-            }}
+            }},
+            {"texture_filter", "point"}
         };
 
         std::ofstream f(resource.paths.inputPath + "resource.json");

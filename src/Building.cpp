@@ -36,6 +36,9 @@ bool BuildTextureResource(const ResourceInfo &resource) {
     if(!resourceLicense.empty())
         gresTable.SetString("LICENSE", resourceLicense);
 
+    if(j_data.count("texture_filter") > 0)
+        gresTable.SetString("texture_filter", j_data["texture_filter"]);
+
     unsigned int textureBytes = 0;
     const auto textureData = LoadFileData(std::string(sourcePath + "tmp/texture.qoi").c_str(), &textureBytes);
     gresTable.SetBytes("texture", std::vector<uint8_t>(textureData, textureData + textureBytes));
@@ -87,6 +90,9 @@ bool BuildSpriteResource(const ResourceInfo &resource) {
 
     if(!resourceLicense.empty())
         gresTable.SetString("LICENSE", resourceLicense);
+
+    if(j_data.count("texture_filter") > 0)
+        gresTable.SetString("texture_filter", j_data["texture_filter"]);
 
     gresTable.SetInt16("origin_x", j_data["origin"][0]);
     gresTable.SetInt16("origin_y", j_data["origin"][1]);

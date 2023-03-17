@@ -104,6 +104,32 @@ ResourceCheckError CheckTilesetResourceIntegrity(const ResourceInfo &resource) {
     return ResourceCheckError::None;
 }
 
+ResourceCheckError CheckNSliceResourceIntegrity(const ResourceInfo &resource) {
+    if(!std::filesystem::exists(resource.paths.inputPath + "resource.json"))
+        return ResourceCheckError::MissingConfig;
+
+    if(!std::filesystem::exists(resource.paths.inputPath + "texture.png"))
+        return ResourceCheckError::MissingContent;
+
+    // Config checking
+    json config;
+    std::ifstream f(resource.paths.inputPath + "resource.json");
+    try {
+        config = json::parse(f);
+    } catch(json::exception &e) {
+        return ResourceCheckError::InvalidConfig;
+    }
+    f.close();
+
+    if(config.count("centre_slice") < 1)    return ResourceCheckError::InvalidConfig;
+    if(config["centre_slice"].size() < 4)   return ResourceCheckError::InvalidConfig;
+
+    if(config.count("stretch_slices") < 1)  return ResourceCheckError::InvalidConfig;
+    if(config["stretch_slices"].size() < 5) return ResourceCheckError::InvalidConfig;
+
+    return ResourceCheckError::None;
+}
+
 ResourceCheckError CheckSoundResourceIntegrity(const ResourceInfo &resource) {
     if(!std::filesystem::exists(resource.paths.inputPath + "resource.json"))
         return ResourceCheckError::MissingConfig;
@@ -131,6 +157,7 @@ ResourceCheckError CheckResourceIntegrity(const ResourceInfo &resource) {
         case ResourceType::Texture: return CheckTextureResourceIntegrity(resource); break;
         case ResourceType::Sprite:  return CheckSpriteResourceIntegrity(resource); break;
         case ResourceType::Tileset: return CheckTilesetResourceIntegrity(resource); break;
+        case ResourceType::NSlice:  return CheckNSliceResourceIntegrity(resource); break;
         case ResourceType::Sound:   return CheckSoundResourceIntegrity(resource); break;
         case ResourceType::Font:    return CheckFontResourceIntegrity(resource); break;
         default:

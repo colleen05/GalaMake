@@ -188,6 +188,72 @@ bool BuildTilesetResource(const ResourceInfo &resource) {
     return true;
 }
 
+bool BuildNSliceResource(const ResourceInfo &resource) {
+    const std::string &sourcePath = resource.paths.inputPath;
+    const std::string &outputFile = resource.paths.outputPath;
+
+    if(!std::filesystem::exists(sourcePath)) return false;
+    std::filesystem::create_directory(sourcePath + "tmp");
+
+    // Check for license
+    std::string resourceLicense = "";
+    if(std::filesystem::exists(sourcePath + "LICENSE")) {
+        std::ifstream f_license(sourcePath + "LICENSE");
+        resourceLicense.assign(
+            std::istreambuf_iterator<char>(f_license),
+            std::istreambuf_iterator<char>()
+        );
+        f_license.close();
+    }
+
+    // Prepare QOI texture
+    Image img_texture = LoadImage(std::string(sourcePath + "texture.png").c_str());
+    if(!ExportImage(img_texture, std::string(sourcePath + "tmp/texture.qoi").c_str())) return false;
+
+    // Read resource information
+    std::ifstream f(sourcePath + "resource.json");
+    if(!f.good()) { f.close(); return false; }
+    json j_data = json::parse(f);
+    f.close();
+
+    // Compile gres data
+    xdt::Table gresTable;
+
+    gresTable.SetString("type", "nslice");
+
+    if(!resourceLicense.empty())
+        gresTable.SetString("LICENSE", resourceLicense);
+
+    if(j_data.count("texture_filter") > 0)
+        gresTable.SetString("texture_filter", j_data["texture_filter"]);
+
+    gresTable.SetInt16("centre_slice.x", j_data["centre_slice"][0]);
+    gresTable.SetInt16("centre_slice.y", j_data["centre_slice"][1]);
+    gresTable.SetInt16("centre_slice.w", j_data["centre_slice"][2]);
+    gresTable.SetInt16("centre_slice.h", j_data["centre_slice"][3]);
+
+    gresTable.SetBool("stretch_slices.top",    j_data["stretch_slices"][0]);
+    gresTable.SetBool("stretch_slices.right",  j_data["stretch_slices"][1]);
+    gresTable.SetBool("stretch_slices.bottom", j_data["stretch_slices"][2]);
+    gresTable.SetBool("stretch_slices.left",   j_data["stretch_slices"][3]);
+    gresTable.SetBool("stretch_slices.centre", j_data["stretch_slices"][4]);
+
+    unsigned int textureBytes = 0;
+    const auto textureData = LoadFileData(std::string(sourcePath + "tmp/texture.qoi").c_str(), &textureBytes);
+    gresTable.SetBytes("texture", std::vector<uint8_t>(textureData, textureData + textureBytes));
+
+    gresTable.Save(outputFile);
+
+    // Clean up
+    UnloadFileData(textureData);
+    std::filesystem::remove_all(sourcePath + "tmp");
+
+    // Verify
+    if(!std::filesystem::exists(outputFile)) return false;
+
+    return true;
+}
+
 bool BuildSoundResource(const ResourceInfo &resource) {
     const std::string &sourcePath = resource.paths.inputPath;
     const std::string &outputFile = resource.paths.outputPath;
@@ -327,6 +393,7 @@ bool BuildResource(const ResourceInfo &resource) {
         case ResourceType::Texture: return BuildTextureResource(resource); break;
         case ResourceType::Sprite:  return BuildSpriteResource(resource); break;
         case ResourceType::Tileset: return BuildTilesetResource(resource); break;
+        case ResourceType::NSlice:  return BuildNSliceResource(resource); break;
         case ResourceType::Sound:   return BuildSoundResource(resource); break;
         case ResourceType::Font:    return BuildFontResource(resource); break;
         default:

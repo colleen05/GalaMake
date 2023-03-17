@@ -241,6 +241,9 @@ bool CheckBuildConfig(const json &buildConfig) {
     if(buildConfig["asset_paths"].count("tilesets") < 1)    return false;
     if(!buildConfig["asset_paths"]["tilesets"].is_string()) return false;
 
+    if(buildConfig["asset_paths"].count("nslices") < 1)    return false;
+    if(!buildConfig["asset_paths"]["nslices"].is_string()) return false;
+
     if(buildConfig["asset_paths"].count("sounds") < 1)    return false;
     if(!buildConfig["asset_paths"]["sounds"].is_string()) return false;
 

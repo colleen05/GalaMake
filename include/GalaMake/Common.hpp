@@ -25,6 +25,7 @@ enum class ResourceType {
     Texture,
     Sprite,
     Tileset,
+    NSlice,
     Sound,
     Font
 };
@@ -44,6 +45,7 @@ static std::map<std::string, ResourceType> g_typeStrs = {
     {"texture", ResourceType::Texture},
     {"sprite",  ResourceType::Sprite},
     {"tileset", ResourceType::Tileset},
+    {"nslice",  ResourceType::NSlice},
     {"sound",   ResourceType::Sound},
     {"font",    ResourceType::Font}
 };
@@ -58,6 +60,7 @@ static json g_defaultBuildConfig = {
         {"textures", "textures/"},
         {"sprites", "sprites/"},
         {"tilesets", "tilesets/"},
+        {"nslices", "nslices/"},
         {"sounds", "sounds/"},
         {"fonts", "fonts/"}
     }},

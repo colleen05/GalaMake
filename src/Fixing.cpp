@@ -71,6 +71,28 @@ bool FixTilesetResource(const ResourceInfo &resource) {
     return true;
 }
 
+bool FixNSliceResource(const ResourceInfo &resource) {
+    if(!std::filesystem::exists(resource.paths.inputPath + "texture.png"))
+        return false;
+
+    if(!std::filesystem::exists(resource.paths.inputPath + "resource.json")) {
+        json config = {
+            {"texture_filter", "point"},
+            {"centre_slice", {32.0f, 32.0f, 32.0f, 32.0f}},
+            {"stretch_slices", {false, false, false, false, false}}
+        };
+
+        std::ofstream f(resource.paths.inputPath + "resource.json");
+        f << config.dump(4);
+        f.close();
+
+        if(!std::filesystem::exists(resource.paths.inputPath + "resource.json"))
+            return false;
+    }
+
+    return true;
+}
+
 bool FixSoundResource(const ResourceInfo &resource) {
     if(!(
         std::filesystem::exists(resource.paths.inputPath + "audio.ogg") ||
@@ -110,6 +132,7 @@ bool FixResource(const ResourceInfo &resource) {
         case ResourceType::Texture: return FixTextureResource(resource); break;
         case ResourceType::Sprite:  return FixSpriteResource(resource); break;
         case ResourceType::Tileset: return FixTilesetResource(resource); break;
+        case ResourceType::NSlice:  return FixNSliceResource(resource); break;
         case ResourceType::Sound:   return FixSoundResource(resource); break;
         case ResourceType::Font:    return FixFontResource(resource); break;
         default:

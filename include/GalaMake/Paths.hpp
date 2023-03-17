@@ -5,6 +5,7 @@
 ResourcePathInfo GetTexturesDirectories (const json &buildConfig);
 ResourcePathInfo GetSpritesDirectories  (const json &buildConfig);
 ResourcePathInfo GetTilesetsDirectories (const json &buildConfig);
+ResourcePathInfo GetNSlicesDirectories  (const json &buildConfig);
 ResourcePathInfo GetSoundsDirectories   (const json &buildConfig);
 ResourcePathInfo GetFontsDirectories    (const json &buildConfig);
 

@@ -1,6 +1,10 @@
 # GalaMake
 Build tool for GalaEngine projects.
 
+## :warning: :rotating_light: DISCONTINUED C++ PROJECT :rotating_light: :warning:
+I'm no longer using C++ for personal projects, thus this project's development has been discontinued.
+Check my GitHub or [**my website**](https://colleen05.me/) for projects coming in the future.
+
 # Usage
 ```
 Usage: galamake <action> [args...] [options...]
